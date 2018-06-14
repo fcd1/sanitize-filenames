@@ -28,12 +28,17 @@ from shutil import move as rename
 import sys
 import unicodedata
 from unidecode import unidecode
-from archivematicaFunctions import unicodeToStr
+# from archivematicaFunctions import unicodeToStr
 
-VERSION = "1.10." + "$Id$".split(" ")[1]
+# VERSION = "1.10." + "$Id$".split(" ")[1]
+# fcd1, 12Jun18: remove all periods except last, remove parens
 valid = "-_.()" + string.ascii_letters + string.digits
 replacementChar = "_"
 
+def unicodeToStr(string):
+    if isinstance(string, unicode):
+        string = string.encode("utf-8")
+    return string
 
 def transliterate(basename):
     # We get a more meaningful name sanitization if UTF-8 names
