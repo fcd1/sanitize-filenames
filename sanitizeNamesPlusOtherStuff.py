@@ -35,7 +35,6 @@ from datetime import datetime
 import csv
 # Note: in python 3.x, ConfigParser has been renamed configparser
 import ConfigParser
-import getpass
 
 # VERSION = "1.10." + "$Id$".split(" ")[1]
 # fcd1, 12Jun18: Current requirements: remove all periods except last, remove parens
@@ -45,6 +44,29 @@ replacementChar = "_"
 # where specified at (if specified) the command line, to also be duplicated in a centralized location
 # for debugging by development staff
 centralizedLoggingDir=os.getcwd()
+
+def yieldNextFile(file_list):
+    i = 0
+    while (True):
+        print(file_list)
+        yield i
+        i+=1
+
+def generateTestFiles():
+    first_set_of_files = map(lambda x : 'batch_one_file' + str(x), range(10))
+    pass
+    print(first_set_of_files)
+    first_set_of_files_bis = map(lambda x,y : 'batch_one_file' + str(x)+ '_' + str(y) , range(10), range(10,20))
+    pass
+    print(first_set_of_files_bis)
+    second_set_of_files = ['batch_two_file' + str(x) for x in range(10)]
+    print(second_set_of_files)
+    third_set_of_files = ['batch_three_file' + str(x) for x in range(10) if x % 2 == 0]
+    print(third_set_of_files)
+    fourth_set_of_files = ['file_' + str(x) + '_' + str(y) for x in [1,2,3] for y in [4,5,6] ]
+    print(fourth_set_of_files)
+    fifth_set_of_files = ['file_' + str(x) + '_' + str(y) for x in [1,2,3] for y in [4,5,6] if x == 2 and y == 6 ]
+    print(fifth_set_of_files)
 
 def unicodeToStr(string):
     if isinstance(string, unicode):
@@ -111,15 +133,14 @@ def sanitizeRecursively(path):
 # duplicate one.
 def setupLogging(systemLogfile,localLogfile=datetime.now().strftime("%d%b%y_%H%M%S")):
 
-    logger = logging.getLogger('sanitize_filenames_logger')
-    logger.setLevel('INFO')
+    logger = logging.getLogger('sanitize_filenames_system_logger')
 
     # Setup system-wide logging handler here. All executions of this script will
     # log to this file (in addition to local logging), this facilitating
     # after-the-fact debugging irregardless of who ran the script
     # The above assumes USG is OK with a group write permission, which
     # would be equivalent to the group that has rename privs on the asset files.
-    systemLogfileHandler = logging.FileHandler(systemLogfile)
+    systemLogfileHandler = logging.FileHandler(systemLogfile)    
     logger.addHandler(systemLogfileHandler)
 
     # local file for logging
@@ -129,18 +150,10 @@ def setupLogging(systemLogfile,localLogfile=datetime.now().strftime("%d%b%y_%H%M
     # tty. Believe stderr
     streamHandler = logging.StreamHandler()
     logger.addHandler(streamHandler)
-
-    # log info about user, script location, etc.
-    logger.info(80 * '#')
-    logger.info('Logging started on ' + datetime.now().strftime("%x") + ' at ' + datetime.now().strftime("%X"))
-    logger.info('User running script: os.getlogin()) returns ' + os.getlogin() + ', getpass.getuser() returns ' + getpass.getuser() + '.')
-    logger.info('Location of this script: ' + os.path.abspath(__file__))
-
-    return logger
-
-def finalLoggingInfo(logger):
-    logger.info('Logging stopped on ' + datetime.now().strftime("%x") + ' at ' + datetime.now().strftime("%X"))
-    logger.info(80 * '#')
+    
+    logger.critical('Hi, Fred')
+    # print(localLogfile)
+    # print(datetime.now().strftime("%d%b%y_%H%M%S"))
 
 def readConfigSettings():
     systemConfig = ConfigParser.ConfigParser()
@@ -164,17 +177,20 @@ def writeCsvFile(csvfilename,iterable):
                              ['orig2','sanit2']])
 
 if __name__ == '__main__':
+    # pre testing
+    # gen = yieldNextFile(['testfile1','testfile2'])
+    # print(gen.next())
+    # print(gen.next())
+    # generateTestFiles()
+    # post testing
 
     # fcd1, 19Jun18: Read in the configs:
     systemConfigSettings, userConfigSettings = readConfigSettings()
     print(systemConfigSettings.get('DEFAULT','systemLogFile'))
-
-    logger = setupLogging(systemLogfile=systemConfigSettings.get('DEFAULT','systemLogFile'),
-                 localLogfile='tmp/localLogfile.log')
-
-    logger.info('About to start processing')
-
-    finalLoggingInfo(logger)
+    
+    setupLogging(systemLogfile=systemConfigSettings.get('DEFAULT','systemLogFile'),
+# FINISH THIS                 localLogfile='tmp/
+    
     parser = argparse.ArgumentParser(description='Sanitize filenames.')
     parser.add_argument('-o','--output-csv-file', help='Specifies CSV output file')
     parser.add_argument('-l','--logfile', help='Specifies logfile, default is sanitize.log')
@@ -185,7 +201,6 @@ if __name__ == '__main__':
         if not os.path.isdir(path):
             print("Not a directory: " + path, file=sys.stderr)
     writeCsvFile('testfile','testiterable')
-    finalLoggingInfo(logger)
     
 if __name__ == '__originalmain__':
     parser = argparse.ArgumentParser(description='Sanitize filenames.')
