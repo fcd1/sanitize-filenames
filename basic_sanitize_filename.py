@@ -1,4 +1,4 @@
-# assumption: Remediate just filenames, not path to filenames
+# assumption: Remediate filenames and path to filenames
 # input: absolute path to directory containing filename to remediate
 # fcd1, 18Oct18: add a no-op operation, where it will print out the change,
 # but not actually change the dir/file name.
