@@ -22,11 +22,11 @@ def main():
     # args.pop(0)
     # print(args)
 
-    parser = argparse.ArgumentParser(description='Sanitize directory contents (files and subdirs)')
+    parser = argparse.ArgumentParser(description='remediate names for directory contents (files and subdirs)')
     parser.add_argument('dirs',
                         metavar='dir',
                         nargs='+',
-                        help='directory to sanitize')
+                        help='directory to remediate')
 
     args = parser.parse_args()
 
